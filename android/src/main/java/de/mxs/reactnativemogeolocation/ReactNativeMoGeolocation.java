@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 public final class ReactNativeMoGeolocation extends ReactContextBaseJavaModule {
 
     private FusedLocationProviderClient fusedLocationClient;
-    private boolean verbose = false;
+    private boolean verbose = true;
 
     private LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -137,7 +137,8 @@ public final class ReactNativeMoGeolocation extends ReactContextBaseJavaModule {
             if (args.hasKey("priority")) {
                 request.setPriority(args.getInt("priority"));
             }
-            request.setInterval(args.getInt("interval"));
+            request.setInterval(5000);
+            request.setFastestInterval(5000);
             if (args.hasKey("smallestDisplacement")) {
                 request.setSmallestDisplacement((float)args.getDouble("smallestDisplacement"));
             }
@@ -146,11 +147,11 @@ public final class ReactNativeMoGeolocation extends ReactContextBaseJavaModule {
             fusedLocationClient.removeLocationUpdates(this.locationCallback);
         }
 
-        if (args.getBoolean("requestLocationUpdates") && args.getBoolean("background")) {
-            ContextCompat.startForegroundService(getReactApplicationContext(), new Intent(getReactApplicationContext(), ReactNativeMoGeolocationService.class));
-        } else {
-            getReactApplicationContext().stopService(new Intent(getReactApplicationContext(), ReactNativeMoGeolocationService.class));
-        }
+        // if (args.getBoolean("requestLocationUpdates") && args.getBoolean("background")) {
+        //     ContextCompat.startForegroundService(getReactApplicationContext(), new Intent(getReactApplicationContext(), ReactNativeMoGeolocationService.class));
+        // } else {
+        //     getReactApplicationContext().stopService(new Intent(getReactApplicationContext(), ReactNativeMoGeolocationService.class));
+        // }
     }
 
     @SuppressWarnings("unused")

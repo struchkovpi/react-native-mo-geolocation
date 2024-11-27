@@ -3,6 +3,7 @@
 
 @interface ReactNativeMoGeolocation : RCTEventEmitter <CLLocationManagerDelegate> {
     BOOL _verbose;
+    NSTimeInterval _lastUpdateTime; // Храним последнее время обновления
 }
 @property CLLocationManager* locationManager;
 @property BOOL verbose;
@@ -11,6 +12,14 @@
 @implementation ReactNativeMoGeolocation
 
 RCT_EXPORT_MODULE()
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _lastUpdateTime = 0; // Инициализируем время последнего обновления
+    }
+    return self;
+}
 
 - (NSArray<NSString *> *)supportedEvents {
     return @[ @"ReactNativeMoGeolocation" ];
@@ -95,6 +104,18 @@ RCT_EXPORT_METHOD(setConfig:(NSDictionary*)args) {
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
     if (self.verbose) NSLog(@"ReactNativeMoGeolocation.didUpdateLocations %@", locations);
+
+    // Получаем текущее время
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+    
+    // Проверяем, прошло ли 5 секунд с последнего обновления
+    if (currentTime - _lastUpdateTime < 5) {
+        return; // Пропускаем обновление, если интервал меньше 5 секунд
+    }
+
+    // Обновляем время последнего обновления
+    _lastUpdateTime = currentTime;
+
     for (CLLocation* location in locations) {
         [self sendEventWithName:@"ReactNativeMoGeolocation" body:@{
             @"type": @"didUpdateLocations",
